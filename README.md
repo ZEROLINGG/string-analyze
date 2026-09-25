@@ -3,11 +3,9 @@
 [![Crates.io](https://img.shields.io/crates/v/string-analyze.svg)](https://crates.io/crates/string-analyze)
 [![Documentation](https://docs.rs/string-analyze/badge.svg)](https://docs.rs/string-analyze)
 [![License](https://img.shields.io/crates/l/string-analyze.svg)](https://github.com/ZEROLINGG/string-analyze/blob/main/LICENSE)
-[![CI](https://github.com/ZEROLINGG/string-analyze/actions/workflows/ci.yml/badge.svg)](https://github.com/ZEROLINGG/string-analyze/actions)
 
 Find key strings from cluttered text — 基于规则流（Rule Flow）的高性能文本扫描引擎，支持并行匹配、多级过滤与高亮报告，常用于 CTF、敏感信息（API Key / Token）检测与高熵字符串提取。
 
-> 本 README 与 crate 级 rustdoc 同源（`src/lib.rs` 通过 `#![doc = include_str!("../README.md")]` 引入），单一数据源，避免分叉。
 
 ## 特性
 
@@ -116,7 +114,7 @@ echo "mTyqm7wjODkrNLcWl0eqO8K8gc1BPk1GNLgUpI==" | string-analyze
 
 ## 特性标志 (Feature Flags)
 
-本项目当前未声明 `[features]`，`default` 即全量功能。后续若新增可选依赖（如 `serde`），将在此列出并与 `Cargo.toml`、`rustdoc` 保持三处一致。
+本项目当前未声明 `[features]`，`default` 即全量功能。
 
 ## 最小 Rust 版本 (MSRV)
 
