@@ -1,0 +1,17 @@
+[package]
+name = "string-analyze"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Find key strings from cluttered text"
+
+[dependencies]
+regex = "1"
+rayon = "1.12.0"
+inventory = "0.3"
+base64 = "0.23"
+hex = "0.4"
+
+
+[dev-dependencies]
+rand = "0.10.2"
