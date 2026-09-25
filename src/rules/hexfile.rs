@@ -42,8 +42,5 @@ lazy_rule!(
     45
 );
 
-
 #[cfg(test)]
-mod tests {
-    
-}
+mod tests {}

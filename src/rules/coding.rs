@@ -1,7 +1,6 @@
 // string_analyze/src/rules/coding.rs
 include!("./core/coding.rs");
 
-
 #[cfg(test)]
 mod tests {
     use crate::analyze_with;
@@ -23,15 +22,21 @@ Ook. Ook.  Ook. Ook.  Ook. Ook.  Ook. Ook.  Ook. Ook.  Ook. Ook.  Ook. Ook.  Ook
 
 "#;
         for line in input.lines() {
-            println!("{}", analyze_with(
-                line,
-                &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
-            ))
+            println!(
+                "{}",
+                analyze_with(
+                    line,
+                    &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
+                )
+            )
         }
         let input  = String::from_utf8(hex::decode("e99bb6e5aebde5ad97e7aca6e280ace2808ce280acefbbbfefbbbfefbbbfe2808defbbbf556e69636f6465e99a90e58699e69cafe99ba8e88b81e2808de2808de2808defbbbfe2808ce280ace280ace2808ce2808de280ace280acefbbbfe2808de280ace2808de2808ce2808de2808de280ace2808de2808ce2808ce2808de2808ce280ace2808cefbbbfefbbbfe280ace2808de2808cefbbbfe2808de2808de2808ce2808de2808de280ace2808de2808d0ae280ace2808de2808defbbbfe2808ce2808ce2808ce2808ce280ace2808ce280ace2808de280ace2808ce2808ce2808de280ace2808de2808de280ace280ace2808de2808ce2808ce280ace2808ce2808de2808defbbbfe2808cefbbbfefbbbfe2808defbbbfe2808de280ace280ace2808ce2808de2808ce2808de280ace2808de2808de280ace2808ce2808defbbbfe2808de2808de280acefbbbfe2808de2808de2808defbbbf0a").unwrap()).unwrap();
-        println!("{}", analyze_with(
-            &*input,
-            &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
-        ))
+        println!(
+            "{}",
+            analyze_with(
+                &input,
+                &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
+            )
+        )
     }
 }

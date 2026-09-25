@@ -22,7 +22,7 @@ lazy_rule!(
     RE_IPV4 = r#"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"#,
     "发现 IPv4 地址",
     10,
-    ((1, false, r"\."),(1, false, r"\."))
+    ((1, false, r"\."), (1, false, r"\."))
 );
 lazy_rule!(
     RE_IPV6 = r#"\b(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:\b[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b"#,
@@ -66,13 +66,16 @@ lazy_rule!(
     RE_PATH_UNIX = r#"(?:~|(?:\.\./|\./)|/)[a-zA-Z0-9._-]+(?:/[a-zA-Z0-9._-]+)+"#,
     "发现 Unix 路径",
     1,
-    ((8, false, r"(?i)(?:[a-z]:?|https?:/?/?)$"), ) // (前断言, 后断言)
+    ((8, false, r"(?i)(?:[a-z]:?|https?:/?/?)$"),) // (前断言, 后断言)
 );
 
-
 lazy_rule!(
-    HIGH_ENTROPY = |s| if s.input.len() <= 512 && entropy(s.input.as_bytes()) >= 5.9 { s.ranges.push((0,s.input.len())); true } else { false } ,
+    HIGH_ENTROPY = |s| if s.input.len() <= 512 && entropy(s.input.as_bytes()) >= 5.9 {
+        s.ranges.push((0, s.input.len()));
+        true
+    } else {
+        false
+    },
     "发现 高熵数据",
     30
 );
-

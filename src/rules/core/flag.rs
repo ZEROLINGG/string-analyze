@@ -2,8 +2,8 @@ use std::sync::LazyLock;
 
 use crate::rules::lazy_rule;
 use crate::tool::{has_chars, has_keyword};
-use base64::engine::general_purpose::{STANDARD as BASE64_STANDARD};
 use base64::Engine;
+use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use hex;
 
 const FLAG_PREFIXES: &[&str] = &[
@@ -31,7 +31,6 @@ const FLAG_PREFIXES: &[&str] = &[
     "flare",
 ];
 
-
 static FLAG_PREFIXES_B64: LazyLock<Vec<String>> = LazyLock::new(|| {
     FLAG_PREFIXES
         .iter()
@@ -55,13 +54,15 @@ static FLAG_PREFIXES_HEX: LazyLock<Vec<String>> = LazyLock::new(|| {
         let escaped: String = bytes.iter().map(|b| format!("\\x{:02x}", b)).collect();
         hex_patterns.push(escaped);
 
-        let ox_formatted: String = bytes.iter()
+        let ox_formatted: String = bytes
+            .iter()
             .map(|b| format!("0x{:02x}", b))
             .collect::<Vec<_>>()
             .join(","); // "0x66,0x6c,0x61..."
         hex_patterns.push(ox_formatted);
 
-        let space_separated: String = bytes.iter()
+        let space_separated: String = bytes
+            .iter()
             .map(|b| format!("{:02x}", b))
             .collect::<Vec<_>>()
             .join(" ");
@@ -90,14 +91,10 @@ lazy_rule!(
             .any(|&prefix| has_keyword(&mut *state, prefix, true)),
     "存在已知flag前缀以及 '{','}'",
     70,
-    |_,input| has_chars(
+    |_, input| has_chars(input, &['{', '}'], false, false)
+        && !has_chars(
             input,
-            &['{', '}'],
-            false,
-            false
-        ) && !has_chars(
-            input,
-            &['(', ')', '[',']','=', ' ','`','"','\'',';',':'],
+            &['(', ')', '[', ']', '=', ' ', '`', '"', '\'', ';', ':'],
             true,
             false
         )
@@ -111,14 +108,10 @@ lazy_rule!(
         }),
     "存在被打乱的flag前缀字符并且含有 '{','}'",
     45,
-    |_,input| has_chars(
+    |_, input| has_chars(input, &['{', '}'], false, false)
+        && !has_chars(
             input,
-            &['{', '}'],
-            false,
-            false
-        ) && !has_chars(
-            input,
-            &['(', ')', '[',']','=', ' ','`','"','\'',';',':'],
+            &['(', ')', '[', ']', '=', ' ', '`', '"', '\'', ';', ':'],
             true,
             false
         )
@@ -131,7 +124,6 @@ lazy_rule!(
             .any(|b64_prefix| has_keyword(&mut *state, b64_prefix, false)),
     "疑似 Base64 编码的 flag前缀",
     65
-
 );
 
 lazy_rule!(
@@ -142,7 +134,6 @@ lazy_rule!(
     "疑似 Hex 编码的 flag前缀",
     65
 );
-
 
 #[cfg(test)]
 mod tests {
@@ -169,10 +160,13 @@ b64_ctf = Y3Rme3Rlc3RfMTIzNH0=
             if line.trim().is_empty() {
                 continue;
             }
-            println!("{}", analyze_with(
-                line,
-                &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
-            ))
+            println!(
+                "{}",
+                analyze_with(
+                    line,
+                    &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
+                )
+            )
         }
     }
 }

@@ -164,12 +164,10 @@ pub fn composite_entropy(bytes: &[u8]) -> f64 {
     (combined * 10.0).clamp(0.0, 10.0)
 }
 
-
-
 #[cfg(test)]
 mod tests {
-    use rand::{random, rng, RngExt};
     use super::*;
+    use rand::{RngExt, random, rng};
 
     #[test]
     fn test_entropy() {
@@ -195,33 +193,65 @@ mod tests {
         ];
 
         for s in input {
-            println!("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            println!("[entropy          ] [{:<5.3}]\t{s:.128}", entropy(s.as_bytes()));
-            println!("[delta_entropy    ] [{:<5.3}]\t{s:.128}", delta_entropy(s.as_bytes()));
-            println!("[gram_entropy2    ] [{:<5.3}]\t{s:.128}", gram_entropy2(s.as_bytes()));
-            println!("[composite_entropy] [{:<5.3}]\t{s:.128}", composite_entropy(s.as_bytes()));
+            println!(
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            );
+            println!(
+                "[entropy          ] [{:<5.3}]\t{s:.128}",
+                entropy(s.as_bytes())
+            );
+            println!(
+                "[delta_entropy    ] [{:<5.3}]\t{s:.128}",
+                delta_entropy(s.as_bytes())
+            );
+            println!(
+                "[gram_entropy2    ] [{:<5.3}]\t{s:.128}",
+                gram_entropy2(s.as_bytes())
+            );
+            println!(
+                "[composite_entropy] [{:<5.3}]\t{s:.128}",
+                composite_entropy(s.as_bytes())
+            );
         }
         let input = &mut vec![
             b"\xd6\x23\x15\x9e\xbd\xe2\x90\xf9\xaa\xa0\x2e\xa0\x80\x9a\xa6\xf3\xcd\x31\xaa\x0d\x04\x6f\x51\x9c\xf1\x34\xcd\xef\x41\x29\xa4\x28\x44\x0c\xf7\x2d\xbb\x3d\x69\xf2\x03\xff\x9d\x54\x95\x25\x2d\x83\xd2\x80\x8d\x44\xef\xef\xf5\x6a\xf8\xc3\x61\x99\x9c\xe9\x2c\xec\x23\x3b\xea\xf3\x43\x1f\x57\xbd\x45\xce\x0e\x96\x4c\xb7\xbf\x28\x08\x16\x77\x53\x83\x59\x16\xd3\xac".as_slice()
         ];
-        let x256 = random::<[u8;256]>();
+        let x256 = random::<[u8; 256]>();
         input.push(x256.as_slice());
-        let x512 = random::<[u8;512]>();
+        let x512 = random::<[u8; 512]>();
         input.push(x512.as_slice());
 
-        let x1024 = random::<[u8;1024]>();
+        let x1024 = random::<[u8; 1024]>();
         input.push(x1024.as_slice());
 
-        let mut x4096 = vec![0u8;4096];
+        let mut x4096 = vec![0u8; 4096];
         rng().fill(&mut x4096);
         input.push(x4096.as_slice());
 
         for b in input {
-            println!("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            println!("[entropy          ] [{:<5.3}]\t{:.128}", entropy(b), format!("{b:?}"));
-            println!("[delta_entropy    ] [{:<5.3}]\t{:.128}", delta_entropy(b), format!("{b:?}"));
-            println!("[gram_entropy2    ] [{:<5.3}]\t{:.128}", gram_entropy2(b), format!("{b:?}"));
-            println!("[composite_entropy] [{:<5.3}]\t{:.128}", composite_entropy(b), format!("{b:?}"));
+            println!(
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            );
+            println!(
+                "[entropy          ] [{:<5.3}]\t{:.128}",
+                entropy(b),
+                format!("{b:?}")
+            );
+            println!(
+                "[delta_entropy    ] [{:<5.3}]\t{:.128}",
+                delta_entropy(b),
+                format!("{b:?}")
+            );
+            println!(
+                "[gram_entropy2    ] [{:<5.3}]\t{:.128}",
+                gram_entropy2(b),
+                format!("{b:?}")
+            );
+            println!(
+                "[composite_entropy] [{:<5.3}]\t{:.128}",
+                composite_entropy(b),
+                format!("{b:?}")
+            );
         }
     }
 }

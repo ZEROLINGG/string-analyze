@@ -102,11 +102,13 @@ flag{5tgb8uik,0ol}
         "#;
 
         for line in input.lines() {
-            println!("{}", analyze_with(
-                line,
-                &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
-            ))
+            println!(
+                "{}",
+                analyze_with(
+                    line,
+                    &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
+                )
+            )
         }
     }
 }
-

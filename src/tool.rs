@@ -25,7 +25,7 @@ pub trait MatchTarget<'a> {
 impl<'a> MatchTarget<'a> for &'a str {
     #[inline]
     fn get_input(&self) -> &'a str {
-        *self
+        self
     }
     #[inline]
     fn clear_ranges(&mut self) {}
@@ -34,7 +34,7 @@ impl<'a> MatchTarget<'a> for &'a str {
 }
 
 // 针对规则状态的实现（会将匹配到的区间真实记录到 State 中）
-impl<'a, 'b> MatchTarget<'a> for &'b mut State<'a> {
+impl<'a> MatchTarget<'a> for &mut State<'a> {
     #[inline]
     fn get_input(&self) -> &'a str {
         self.input
@@ -103,7 +103,7 @@ pub fn has_keyword<'a>(mut target: impl MatchTarget<'a>, keyword: &str, ignore_c
 /// # 参数
 /// - `chars`: 需要查找的字符数组。
 /// - `any`: 如果为 `true`，只要出现 `chars` 中的任意一个字符即算匹配成功；
-///          如果为 `false`，则必须包含 `chars` 中的**所有**不同字符才算成功。
+///   如果为 `false`，则必须包含 `chars` 中的**所有**不同字符才算成功。
 /// - `ignore_case`: 是否忽略 ASCII 大小写。
 #[inline]
 pub fn has_chars<'a>(
@@ -265,8 +265,11 @@ pub fn is_base64(s: &str) -> bool {
 
     // 4. Base64 有效载荷通常不能以特殊符号结尾
     // (结尾字符的低位必须是 0 作为隐式填充，因此对应字典表中的字符不可能是这几个)
-    if trimmed.ends_with('/') || trimmed.ends_with('+') ||
-        trimmed.ends_with('-') || trimmed.ends_with('_') {
+    if trimmed.ends_with('/')
+        || trimmed.ends_with('+')
+        || trimmed.ends_with('-')
+        || trimmed.ends_with('_')
+    {
         return false;
     }
 
@@ -387,12 +390,19 @@ pub fn is_hex(input: &str) -> bool {
     }
 
     // 提取重复性前缀
-    let prefix = if s.starts_with("0x") { "0x" }
-    else if s.starts_with("0X") { "0X" }
-    else if s.starts_with("\\x") { "\\x" }
-    else if s.starts_with("\\X") { "\\X" }
-    else if s.starts_with("%") { "%" }
-    else { "" };
+    let prefix = if s.starts_with("0x") {
+        "0x"
+    } else if s.starts_with("0X") {
+        "0X"
+    } else if s.starts_with("\\x") {
+        "\\x"
+    } else if s.starts_with("\\X") {
+        "\\X"
+    } else if s.starts_with("%") {
+        "%"
+    } else {
+        ""
+    };
 
     let mut idx = prefix.len();
     let bytes = s.as_bytes();
@@ -407,13 +417,23 @@ pub fn is_hex(input: &str) -> bool {
     // 内部校验是否为有效的 Hex 字符，并记录大小写状态
     #[inline]
     fn check_hex(b: u8, upper: &mut bool, lower: &mut bool) -> bool {
-        if b.is_ascii_digit() { return true; }
-        if (b'a'..=b'f').contains(&b) { *lower = true; return true; }
-        if (b'A'..=b'F').contains(&b) { *upper = true; return true; }
+        if b.is_ascii_digit() {
+            return true;
+        }
+        if (b'a'..=b'f').contains(&b) {
+            *lower = true;
+            return true;
+        }
+        if (b'A'..=b'F').contains(&b) {
+            *upper = true;
+            return true;
+        }
         false
     }
 
-    if !check_hex(bytes[idx], &mut upper_hex, &mut lower_hex) || !check_hex(bytes[idx+1], &mut upper_hex, &mut lower_hex) {
+    if !check_hex(bytes[idx], &mut upper_hex, &mut lower_hex)
+        || !check_hex(bytes[idx + 1], &mut upper_hex, &mut lower_hex)
+    {
         return false;
     }
     idx += 2;
@@ -424,7 +444,7 @@ pub fn is_hex(input: &str) -> bool {
     } else {
         if !prefix.is_empty() {
             if let Some(next_prefix_idx) = s[idx..].find(prefix) {
-                &s[idx .. idx + next_prefix_idx]
+                &s[idx..idx + next_prefix_idx]
             } else {
                 return false;
             }
@@ -437,7 +457,7 @@ pub fn is_hex(input: &str) -> bool {
                 }
                 sep_len += 1;
             }
-            &s[idx .. idx + sep_len]
+            &s[idx..idx + sep_len]
         }
     };
 
@@ -451,12 +471,18 @@ pub fn is_hex(input: &str) -> bool {
 
     // 遍历循环验证整条数据链
     while curr_idx < bytes.len() {
-        if !s[curr_idx..].starts_with(prefix) { return false; }
+        if !s[curr_idx..].starts_with(prefix) {
+            return false;
+        }
         curr_idx += prefix.len();
 
-        if curr_idx + 2 > bytes.len() { return false; }
+        if curr_idx + 2 > bytes.len() {
+            return false;
+        }
 
-        if !check_hex(bytes[curr_idx], &mut upper_hex, &mut lower_hex) || !check_hex(bytes[curr_idx+1], &mut upper_hex, &mut lower_hex) {
+        if !check_hex(bytes[curr_idx], &mut upper_hex, &mut lower_hex)
+            || !check_hex(bytes[curr_idx + 1], &mut upper_hex, &mut lower_hex)
+        {
             return false;
         }
 
@@ -484,14 +510,13 @@ pub fn is_hex(input: &str) -> bool {
     count > 0
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test() {
-        has_keyword("","",true);
-        has_keyword(&mut State::new(""),"",true);
+        has_keyword("", "", true);
+        has_keyword(&mut State::new(""), "", true);
     }
 }

@@ -1,7 +1,5 @@
 use crate::rules::lazy_rule;
 
-
-
 // 1. Anthropic (Claude)
 lazy_rule!(
     RE_ANTHROPIC_KEY = r#"\bsk-ant-(?:api03|oat01)-[A-Za-z0-9_-]{80,}\b"#,
@@ -58,29 +56,33 @@ lazy_rule!(
     90
 );
 
-
 lazy_rule!(
     RE_OPENAI_KEY = r#"\bsk-(?:proj-|svcacct-|admin-)?[A-Za-z0-9_]{20,120}\b"#,
     "发现 OpenAI API Key",
     88,
     |slice, _input| {
-        if slice.starts_with("sk-or-v1-") { return false; }  // OpenRouter
-        if slice.starts_with("sk-ant-") { return false; }    // Anthropic
+        if slice.starts_with("sk-or-v1-") {
+            return false;
+        } // OpenRouter
+        if slice.starts_with("sk-ant-") {
+            return false;
+        } // Anthropic
 
         if slice.len() == 35 && slice[3..].chars().all(|c| c.is_ascii_hexdigit()) {
             return false;
         }
 
         if (40..=64).contains(&(slice.len() - 3))
-            && slice[3..].chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()) {
+            && slice[3..]
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+        {
             return false;
         }
 
         true
     }
 );
-
-
 
 // 10. DeepSeek
 lazy_rule!(
@@ -96,8 +98,6 @@ lazy_rule!(
     80
 );
 
-
-
 // 12. ElevenLabs
 lazy_rule!(
     RE_ELEVENLABS_KEY = r#"\bsk_[a-f0-9]{48}\b"#,
@@ -111,7 +111,6 @@ lazy_rule!(
     "发现 Cerebras API Key",
     85
 );
-
 
 #[cfg(test)]
 mod tests {
@@ -136,10 +135,13 @@ gemini_key = AIzaSyabcdefghijklmnopqrstuvwxyz1234567
 nvapi_key = nvapi-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
 "#;
         for line in input.lines() {
-            println!("{:#}", analyze_with(
-                line,
-                &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
-            ))
+            println!(
+                "{:#}",
+                analyze_with(
+                    line,
+                    &get_rules(|m, _| module_path!().split("::tests").any(|s| s == m)),
+                )
+            )
         }
     }
 }

@@ -70,7 +70,7 @@ lazy_rule!(
     RE_CREDIT_CARD = r"\b[1-9]\d{12,18}\b",
     "发现 疑似信用卡号",
     90,
-    |input,_| is_valid_bin(input) && luhn_check(input)
+    |input, _| is_valid_bin(input) && luhn_check(input)
 );
 
 lazy_rule!(
@@ -78,14 +78,14 @@ lazy_rule!(
         r#"[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx]"#,
     "发现 疑似中国大陆身份证号",
     90,
-    |input,_| id_card_check(input)
+    |input, _| id_card_check(input)
 );
 
 lazy_rule!(
     RE_CN_PHONE = r#"\b1[3-9]\d{9}\b"#,
     "发现 疑似手机号",
     60,
-    ((10, false, r"(?i)(order|id|stamp|time)"), )
+    ((10, false, r"(?i)(order|id|stamp|time)"),)
 );
 lazy_rule!(
     RE_PASSPORT = r#"\b[A-Z]{1,2}[0-9]{6,9}\b"#,
@@ -137,16 +137,14 @@ lazy_rule!(
     RE_CN_USCI = r#"\b[1-9A-HJ-NPQRTUWXY][0-9A-HJ-NPQRTUWXY]\d{6}[0-9A-HJ-NPQRTUWXY]{10}\b"#,
     "发现 统一社会信用代码",
     90,
-    |input,_| usci_check(input)
+    |input, _| usci_check(input)
 );
-
-
 
 lazy_rule!(
     RE_TW_ID = r"\b[A-Z][12]\d{8}\b",
     "发现 台湾身份证号",
     90,
-    |input,_| tw_id_check(input)
+    |input, _| tw_id_check(input)
 );
 
 fn tw_id_check(id: &str) -> bool {

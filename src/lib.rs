@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
-pub mod rules;
 pub mod entropy;
+pub mod rules;
 pub mod tool;
 
 use rayon::prelude::*;
@@ -134,8 +134,10 @@ impl<'a> From<State<'a>> for RuleResult<'a> {
 /// 并调用 `out` 生成最终的 `Hit` 报告。
 pub struct AnyRule {
     /// 规则流：一系列依次执行的闭包，可修改 `State` 并返回是否继续执行。
+    #[allow(clippy::type_complexity)]
     pub flow: Vec<Box<dyn for<'a> Fn(&mut State<'a>) -> bool + Send + Sync>>,
     /// 结果生成器：当所有 flow 都通过时，将 `State` 转换为 `Hit`。
+    #[allow(clippy::type_complexity)]
     pub out: Box<dyn for<'a> Fn(State<'a>) -> Hit<'a, RuleResult<'a>> + Send + Sync>,
 }
 
@@ -318,8 +320,8 @@ impl fmt::Display for AnalyzeResult<'_> {
 
 #[cfg(test)]
 mod tests {
-    use crate::rules::ALL_RULES;
     use super::*;
+    use crate::rules::ALL_RULES;
 
     #[test]
     fn test_comprehensive() {

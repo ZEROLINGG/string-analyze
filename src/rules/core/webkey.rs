@@ -37,4 +37,3 @@ lazy_rule!(
     "发现 Rails secret_key_base",
     80
 );
-

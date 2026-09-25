@@ -5,9 +5,9 @@
 //! 模块内提供的 `lazy_rule!` 宏是定义扫描规则的核心工具。
 
 pub mod b64file;
+pub mod coding;
 pub mod core;
 pub mod hexfile;
-pub mod coding;
 
 use std::collections::HashSet;
 use std::sync::LazyLock;
@@ -385,7 +385,6 @@ where
     for entry in inventory::iter::<RuleEntry> {
         // 1. 应用模块和严重程度过滤
         if filter(entry.module_path, entry.importance) {
-
             // 避免同名规则重复加载
             if !seen_names.insert(entry.name) {
                 continue;
@@ -400,27 +399,27 @@ where
                     importance: r.importance,
                     data: RuleResult::from(state),
                 })
-                    // Flow 1: 基础查找
-                    .add_flow(move |state| r.find.find(state))
-                    // Flow 2: 复合熵值校验
-                    .add_flow(move |state| {
-                        if let Some(min_ent) = r.min_entropy {
-                            state.retain(|input, (start, end)| {
-                                composite_entropy((&input[start..end]).as_bytes()) >= min_ent
-                            });
-                        }
-                        !state.ranges.is_empty()
-                    })
-                    // Flow 3: 上下文断言校验 (Lookaround)
-                    .add_flow(move |state| {
-                        r.check_assertions(state);
-                        !state.ranges.is_empty()
-                    })
-                    // Flow 4: 自定义代码校验
-                    .add_flow(move |state| {
-                        r.check_custom(state);
-                        !state.ranges.is_empty()
-                    }),
+                // Flow 1: 基础查找
+                .add_flow(move |state| r.find.find(state))
+                // Flow 2: 复合熵值校验
+                .add_flow(move |state| {
+                    if let Some(min_ent) = r.min_entropy {
+                        state.retain(|input, (start, end)| {
+                            composite_entropy(&input.as_bytes()[start..end]) >= min_ent
+                        });
+                    }
+                    !state.ranges.is_empty()
+                })
+                // Flow 3: 上下文断言校验 (Lookaround)
+                .add_flow(move |state| {
+                    r.check_assertions(state);
+                    !state.ranges.is_empty()
+                })
+                // Flow 4: 自定义代码校验
+                .add_flow(move |state| {
+                    r.check_custom(state);
+                    !state.ranges.is_empty()
+                }),
             );
         }
     }
