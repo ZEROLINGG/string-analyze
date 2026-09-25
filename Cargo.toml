@@ -4,6 +4,18 @@ version = "0.1.0"
 edition = "2024"
 license = "MIT"
 description = "Find key strings from cluttered text"
+readme = "README.md"
+repository = "https://github.com/ZEROLINGG/string-analyze"
+documentation = "https://docs.rs/string-analyze"
+homepage = "https://github.com/ZEROLINGG/string-analyze"
+keywords = ["ctf", "security", "secret-scanning", "entropy", "string-analysis"]
+categories = ["command-line-utilities", "text-processing"]
+authors = ["ZEROLINGG"]
+rust-version = "1.85"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 regex = "1"

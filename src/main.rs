@@ -10,6 +10,6 @@ fn main() {
             if r.score() != 0 {
                 println!("{:#}", r);
             }
-        } else { break; }
+        }
     }
 }

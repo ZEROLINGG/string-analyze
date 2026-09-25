@@ -231,57 +231,104 @@ pub fn has_lower(input: &str) -> bool {
     input.bytes().any(|b| b.is_ascii_lowercase())
 }
 
-/// 启发式判断字符串是否可能是一段真实的 Base64 编码数据。
-///
-/// 旨在过滤掉碰巧符合 Base64 字符集范围的普通英语长句或纯数字。
+/// 启发式判断字符串是否可能是一段真实的 Base64 编码数据 (支持 URL-Safe & 无填充格式)
 ///
 /// # 过滤规则 (Heuristics)
 /// 1. **长度限制**: 必须大于 8 个字符。
-/// 2. **填充符校验**: `=` 最多出现 2 次。
-/// 3. **非法结尾**: 有效载荷（去除 `=` 后）不能以 `/` 或 `+` 结尾。
-/// 4. **字节对齐**: 总长度必须是 4 的倍数。
-/// 5. **混入度校验**: 必须包含数字或特殊字符（`+`, `/`, `=`），防止将纯字母当成 Base64。
-/// 6. **大小写比例**: 大写字母在总字母中的比例必须介于 `0.2` 到 `0.8` 之间（真实的 Base64 大小写分布往往较为均匀）。
-/// 7. **大小写共存**: 必须同时包含大写和小写字母。
+/// 2. **字节对齐**: 真实 Base64 剔除 '=' 后，长度对 4 取模绝对不能为 1。
+/// 3. **填充符校验**: `=` 最多出现 2 次。
+/// 4. **非法结尾**: 有效载荷不能以 `+`, `/`, `-`, `_` 结尾（基于编码填充位的数学特性）。
+/// 5. **混入度校验**: 必须包含数字或特殊字符（`+`, `/`, `-`, `_`, `=`），防止将纯字母当成 Base64。
+/// 6. **连续性检查**: 不能有连续 8 个大写或小写字母，防止英文长单词或全大写常量误报。
+/// 7. **大小写比例**: 大写字母在总字母中的比例必须介于 `0.25` 到 `0.75` 之间。
 pub fn is_base64(s: &str) -> bool {
     let len = s.len();
 
-    // 1. 长度检查：至少4个字符，出于降噪目的要求大于 8
+    // 1. 基础长度限制，降噪
     if len <= 8 {
         return false;
     }
 
-    // 2. 去除填充符并检查
+    // 3. 去除填充符并检查
     let trimmed = s.trim_end_matches('=');
     let padding_count = len - trimmed.len();
 
-    // 填充符只能是0, 1, 或2个
     if padding_count > 2 {
         return false;
     }
 
-    // 3. Base64 有效载荷不能以 / 或 + 结尾
-    if trimmed.ends_with('/') || trimmed.ends_with('+') {
-        return false;
-    }
-    if len % 4 != 0 {
+    // 2. 字节对齐检查 (核心修改)
+    // 无论是标准还是 URL-Safe，无 '=' 状态下的有效载荷长度 % 4 只能是 0, 2, 3。
+    if trimmed.len() % 4 == 1 {
         return false;
     }
 
-    // 4. 必须包含至少一个数字或特殊符号
-    let has_digit = s.bytes().any(|b| b.is_ascii_digit());
-    let has_special = s.contains('+') || s.contains('/') || s.contains('=');
+    // 4. Base64 有效载荷通常不能以特殊符号结尾
+    // (结尾字符的低位必须是 0 作为隐式填充，因此对应字典表中的字符不可能是这几个)
+    if trimmed.ends_with('/') || trimmed.ends_with('+') ||
+        trimmed.ends_with('-') || trimmed.ends_with('_') {
+        return false;
+    }
+
+    let mut upper_count = 0;
+    let mut letter_count = 0;
+
+    let mut has_digit = false;
+    let mut has_special = padding_count > 0;
+
+    let mut consecutive_upper = 0;
+    let mut consecutive_lower = 0;
+
+    // 单次遍历优化 (O(N))
+    for b in trimmed.bytes() {
+        if b.is_ascii_uppercase() {
+            upper_count += 1;
+            letter_count += 1;
+            consecutive_upper += 1;
+            consecutive_lower = 0;
+
+            if consecutive_upper >= 8 {
+                return false;
+            }
+        } else if b.is_ascii_lowercase() {
+            letter_count += 1;
+            consecutive_lower += 1;
+            consecutive_upper = 0;
+
+            if consecutive_lower >= 8 {
+                return false;
+            }
+        } else {
+            // 打断连续性
+            consecutive_upper = 0;
+            consecutive_lower = 0;
+
+            if b.is_ascii_digit() {
+                has_digit = true;
+            } else if b == b'+' || b == b'/' || b == b'-' || b == b'_' {
+                // 将 - 和 _ 纳入特殊字符检测
+                has_special = true;
+            }
+        }
+    }
+
+    // 5. 必须包含至少一个数字或特殊符号
     if !has_digit && !has_special {
         return false;
     }
 
-    // 5. 校验大小写字母的分布比例，过高或过低都认为不是 Base64
-    let prob = upper_prob(trimmed);
-    if prob <= 0.2 || prob >= 0.8 {
+    // 避免除零异常
+    if letter_count == 0 {
         return false;
     }
 
-    has_upper(s) && has_lower(s)
+    // 7. 校验大小写字母的分布比例
+    let prob = (upper_count as f64) / (letter_count as f64);
+    if prob <= 0.25 || prob >= 0.75 {
+        return false;
+    }
+
+    true
 }
 
 /// 统计字符串中各 ASCII 字符的出现频率，并按降序排序。

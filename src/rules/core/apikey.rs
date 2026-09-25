@@ -11,11 +11,6 @@ lazy_rule!(
     80
 );
 lazy_rule!(
-    RE_GOOGLE_API = r#"\bAIza[0-9A-Za-z_-]{35}\b"#,
-    "发现 Google API Key",
-    80
-);
-lazy_rule!(
     RE_SLACK_TOKEN = r#"\bxox[baprs]-[0-9]{10,13}-[a-zA-Z0-9-]{24,34}\b"#,
     "发现 Slack Token",
     80
@@ -82,11 +77,7 @@ lazy_rule!(
     "发现 MongoDB Atlas 凭证",
     80
 );
-lazy_rule!(
-    RE_HUGGINGFACE = r#"\bhf_[A-Za-z0-9]{34,40}\b"#,
-    "发现 Hugging Face Token",
-    80
-);
+
 lazy_rule!(
     RE_CLOUDFLARE_TOKEN = r#"(?i)\bcloudflare[_-]?api[_-]?token\s*[:=]\s*[A-Za-z0-9_-]{40}\b"#,
     "发现 Cloudflare API Token",

@@ -40,11 +40,6 @@ lazy_rule!(
     "发现 CIDR",
     10
 );
-lazy_rule!(
-    RE_CLOUD_BUCKET = r#"(?i)\b[a-z0-9.-]+\.(?:s3\.amazonaws\.com|oss-cn-[a-z0-9-]+\.aliyuncs\.com|cos\.ap-[a-z0-9-]+\.myqcloud\.com)\b"#,
-    "发现 云存储桶 URL (S3/OSS/COS)",
-    20
-);
 
 lazy_rule!(
     RE_UUID = r#"(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"#,
@@ -76,7 +71,7 @@ lazy_rule!(
 
 
 lazy_rule!(
-    HIGH_ENTROPY = |s| if s.input.len() <= 512 && entropy(s.input.as_bytes()) >= 5.1 { s.ranges.push((0,s.input.len())); true } else { false } ,
+    HIGH_ENTROPY = |s| if s.input.len() <= 512 && entropy(s.input.as_bytes()) >= 5.9 { s.ranges.push((0,s.input.len())); true } else { false } ,
     "发现 高熵数据",
     30
 );

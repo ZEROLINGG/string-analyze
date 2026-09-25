@@ -1,8 +1,4 @@
-//! 文本分析与模式匹配引擎。
-//!
-//! 该模块提供了一套基于规则流 (Rule Flow) 的文本扫描框架。
-//! 它支持并行处理、多步骤条件过滤，并能通过终端 ANSI 转义序列输出高亮分析报告。
-//! 常用于敏感信息（如 API Key、Token）检测或特定格式数据的提取。
+#![doc = include_str!("../README.md")]
 
 pub mod rules;
 pub mod entropy;

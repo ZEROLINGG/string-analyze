@@ -104,9 +104,11 @@ lazy_rule!(
 );
 
 fn usci_check(s: &str) -> bool {
-    if s.len() != 18 {
+    // 1. 拦截全零或全重复字符的误报
+    if s.len() != 18 || s.chars().all(|c| c == '0') {
         return false;
     }
+
     let dict = "0123456789ABCDEFGHJKLMNPQRTUWXY";
     let weights = [
         1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 14, 12, 5, 15, 14, 12,
@@ -132,11 +134,13 @@ fn usci_check(s: &str) -> bool {
 }
 
 lazy_rule!(
-    RE_CN_USCI = r#"[0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10}"#,
+    RE_CN_USCI = r#"\b[1-9A-HJ-NPQRTUWXY][0-9A-HJ-NPQRTUWXY]\d{6}[0-9A-HJ-NPQRTUWXY]{10}\b"#,
     "发现 统一社会信用代码",
     90,
     |input,_| usci_check(input)
 );
+
+
 
 lazy_rule!(
     RE_TW_ID = r"\b[A-Z][12]\d{8}\b",
